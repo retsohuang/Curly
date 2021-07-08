@@ -9,74 +9,74 @@
 import UIKit
 
 class NavDelegateViewController: UIViewController {
-
-    @IBAction func tappedPresent(sender: AnyObject) {
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let navController = segue.destination as! UINavigationController
         
-        //Performing segue with closure
+        //Setting navigation controller delegate with closure
         
-        self.performSegueWithIdentifier("navigation", sender:nil) {
-            (segue:UIStoryboardSegue,sender:AnyObject?) in
-            
-            let navController = segue.destinationViewController as UINavigationController
-            
-            //Setting navigation controller delegate with closure
-            
-            navController.setDelegate(
-                willShow: {
-                    [weak navController]
-                    (viewController:UIViewController, animated) in
+        navController.setDelegate(
+            willShow: {
+                [weak navController]
+                (viewController:UIViewController, animated) in
+                
+                
+                
+                let index = (navController!.viewControllers as [UIViewController]).contains(viewController)
+                    ? navController!.viewControllers.count - 1
+                    : navController!.viewControllers.count
+                
+                //Setting title
+                viewController.navigationItem.title = "View Controller #\(index+1)"
+                
+            },
+            didShow: {
+                [weak navController]
+                (viewController:UIViewController, animated) in
+                
+                let index = (navController!.viewControllers as [UIViewController]).contains(viewController)
+                    ? navController!.viewControllers.count - 1
+                    : navController!.viewControllers.count
+                
+                switch index {
                     
-                    let index = contains(navController!.viewControllers as [UIViewController],viewController)
-                        ? navController!.viewControllers.count - 1
-                        : navController!.viewControllers.count
+                case 3: //Last
                     
-                    //Setting title
-                    viewController.navigationItem.title = "View Controller #\(index+1)"
+                    break
                     
-                },
-                didShow: {
-                    [weak navController]
-                    (viewController:UIViewController, animated) in
+                case 0: //First
                     
-                    let index = contains(navController!.viewControllers as [UIViewController],viewController)
-                        ? navController!.viewControllers.count - 1
-                        : navController!.viewControllers.count
+                    //Adding left bar button item with closure
                     
-                    switch index {
+                    viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: UIBarButtonItemStyle.done) {
+                        [weak navController] in
                         
-                    case 3: //Last
-                        
-                        break
-                        
-                    case 0: //First
-                        
-                        //Adding left bar button item with closure
-                        
-                        viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: UIBarButtonItemStyle.Done) {
-                            [weak navController] in
-                            
-                            navController!.presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
-                        }
-                        
-                        fallthrough
-                        
-                    default:
-                        
-                        //Adding right bar button item with closure
-                        
-                        viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Next", style: UIBarButtonItemStyle.Plain) {
-                            [weak viewController] in
-                            
-                            viewController!.performSegueWithIdentifier("next", sender:nil)
-                        }
+                        navController!.presentingViewController!.dismiss(animated: true, completion: nil)
                     }
                     
+                    fallthrough
+                    
+                default:
+                    
+                    //Adding right bar button item with closure
+                    
+                    viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Next", style: UIBarButtonItemStyle.plain) {
+                        [weak viewController] in
+                        
+                        viewController!.performSegue(withIdentifier: "next", sender:nil)
+                    }
                 }
-            )
-            
-        }
-        
+                
+            }
+        )
     }
+    
+    @IBAction func tappedPresent(_ sender: Any) {
+        //Performing segue with closure
+        
+        self.performSegue(withIdentifier: "navigation", sender:nil)
+    }
+    
     
     
     

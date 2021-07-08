@@ -1,7 +1,7 @@
 Curly
 =====
 
-iOS library adding *closure* (*block* or *callback*) functionality to several native classes (alert views, buttons, sliders, storyboard segues, gesture recognizers, etc).
+iOS library adding *closure* (*block* or *callback*) functionality to several native classes (buttons, sliders, notifications, etc).
 
 This library is written in **Swift** but it also works in **Objective-C**. Make sure to read the installation notes below.
 
@@ -11,8 +11,8 @@ Contents
 1. [Installation](#1-installation)
 2. [Usage](#2-usage)
   * [Buttons, Sliders, etc (UIControl)](#buttons-sliders-etc-uicontrol)
-  * [Alert Views](#alert-views)
-  * [Storyboard Segues](#storyboard-segues)
+  * [~~Alert Views~~ (No longer supported. Use `UIAlertController`)](#alert-views)
+  * [Notifications](#notifications)
   * [Gesture Recognizers](#gesture-recognizers)
   * [Some Delegates](#some-delegates)
   * [Observing an Object's Deinit (Dealloc)](#observing-an-objects-deinit-dealloc)
@@ -20,7 +20,11 @@ Contents
 1. Installation
 ------------
 
-Just add Curly.swift to your project :)
+Just add Curly.swift to your project, or use [CocoaPods](https://cocoapods.org):
+
+```
+pod "Curly", :git => 'https://github.com/wircho/Curly.git', :branch => 'master'
+```
 
 This library is written in **Swift** but it also works in **Objective-C**. If you are using Objective-C, make sure you add `#import "[YourProjectName]-Swift.h"` at the beginning of your Objective-C file. You may need to compile once for the Swift methods to be recognized by Xcode's Objective-C editor.
 
@@ -37,7 +41,7 @@ You can preview the functionality below by running the sample project in the **C
 button.addAction(.TouchUpInside) {
     (bttn:UIButton) -> Void in
     
-    println("tapped button")
+    print("tapped button")
             
 }
 ```
@@ -46,7 +50,7 @@ button.addAction(.TouchUpInside) {
 slider.addAction(.ValueChanged) {
     (sldr:UISlider) -> Void in
     
-    println("moved slider")
+    print("moved slider")
             
 }
 ```
@@ -71,55 +75,27 @@ This works with any subclass of UIControl.
 }];
 ```
 
-### Alert Views: ###
+### ~~Alert Views:~~ ###
+
+This functionality is no longer supported by Curly. Please use [`UIAlertController`](https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAlertController_class/).
+
+### Notifications: ###
 
 ##### Swift: #####
 
 ```swift
-alertView.show(didDismiss:{(alertView:UIAlertView, buttonIndex:Int) -> Void in
-
-    println("dismissed with button at index \(buttonIndex)")
-            
-})
-```
-Other methods are: `.show(clicked:)`, `.show(willDismiss:)` and the more complete version `.show(clicked:,willPresent:,didPresent:,willDismiss:,didDismiss:,canceled:,shouldEnableFirstOtherButton:)`
-
-##### Objective-C: #####
-
-```objective-c
-[alertView showWithDidDismiss:^(UIAlertView *alertView, NSInteger buttonIndex) {
-
-    NSLog(@"dismissed with button at index %d",(int)buttonIndex);
+"SOME-NOTIFICATION-NAME".observeFrom(self) {
+    innerSelf, note in
     
-}];
-```
-
-The other Objective-C methods are: `showWithclicked:`, `.showWithWillDismiss:` and the more complete version `showWithClicked:willPresent:didPresent:willDismiss:didDismiss:canceled:shouldEnableFirstOtherButton:`
-
-### Storyboard Segues: ###
-
-The method below works as long as you don't override `prepareForSegue` in your `UIViewController`'s subclass.
-
-##### Swift: #####
-
-```swift
-self.performSegueWithIdentifier("segue", sender: nil) {
-    (segue:UIStoryboardSegue, sender:AnyObject?) -> Void in
-            
-    println("preparing for segue!")
-            
+    print("Listening to NSNotification \(note) from \(innerSelf)")
 }
 ```
 
+The code above has the added advantage that the observation stops as soon as `self` is released/deinited. If you would like to have more control, the method above returns a `CurlyNotificationToken` which you may keep and cancel at any time using `token.cancel()`.
+
 ##### Objective-C: #####
 
-```objective-c
-[[UIViewController alloc] performSegueWithIdentifier:@"segue" sender:nil preparation:^(UIStoryboardSegue *segue, id sender) {
-                
-    NSLog(@"preparing for segue!");
-                
-}];
-```
+No special Objective-C support yet.
 
 ### Gesture Recognizers: ###
 
@@ -129,7 +105,7 @@ self.performSegueWithIdentifier("segue", sender: nil) {
 let gestureRecognizer = UIPanGestureRecognizer {
     (gr:UIPanGestureRecognizer)->Void in
                 
-    println("gesture recognizer: \(gr)")
+    print("gesture recognizer: \(gr)")
     
 }
 ```
@@ -155,7 +131,7 @@ With Curly you can define delegates for UIScrollView and UINavigationController 
 ```swift
 scrollView.setDelegate(
     didScroll: { (scrollView:UIScrollView) -> Void in
-        println("did scroll")
+        print("did scroll")
     }
  )
 ```
@@ -165,10 +141,10 @@ For the complete `UIScrollViewDelegate` functionality use `.setDelegate(willBegi
 ```swift
 navigationController.setDelegate(
     willShow: { (viewController:UIViewController) -> Void in
-        println("will show")
+        print("will show")
     },
     didShow: { (viewController:UIViewController) -> Void in
-        println("did show")
+        print("did show")
     }
  )
 ```
@@ -201,7 +177,7 @@ The method below works with any subclass of NSObject. Unfortunately, as of now, 
 
 ```swift
 object.deinited {
-    println("object has been deinited")
+    print("object has been deinited")
 }
 ```
 

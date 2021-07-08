@@ -14,10 +14,8 @@ class DeinitViewController: UIViewController {
     
     @IBOutlet weak var button: UIButton!
     
-    @IBAction func tappedButton(sender: UIButton) {
-        
-        sender.removeFromSuperview()
-        
+    @IBAction func tappedButton(_ sender: Any) {
+        button.removeFromSuperview()
     }
     
     override func viewDidLoad() {
